@@ -1,6 +1,6 @@
 {
     "name": "geodex",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "A modern, zero-dependency, and tree-shakeable JavaScript library for comprehensive country, currency, and language data. Includes full TypeScript support and lookup functions.",
     "author": {
         "name": "Future Station",
