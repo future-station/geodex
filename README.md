@@ -1,198 +1,196 @@
-# Country List
+# Geodex
 
-There are lots of little bits of data that you often need relating to countries,
-and I couldn't find any easy to use source of it. So I compiled it all here.
+A modern, zero-dependency, and tree-shakeable JavaScript library for comprehensive country, currency, and language data.
 
-## Work in Progress
+[](https://www.google.com/search?q=https://www.npmjs.com/package/geodex)
+[](https://opensource.org/licenses/MIT)
+[](https://www.google.com/search?q=https://github.com/future-station/geodex/actions)
 
-feel free to use it, but be sure to check between upgrades.
+-----
 
-I suspect that many of the `currencies` entries on the countries may be wrong. Help checking them would be appreciated.
+## Features
 
-## Countries
+- **Comprehensive Data**: Access standardized information for countries, currencies, and languages.
+- **Zero-Dependency**: Lightweight and won't add extra bloat to your project.
+- **Fully Tree-Shakeable**: Import only the data you need, keeping your bundle size to a minimum.
+- **TypeScript Native**: Written entirely in TypeScript, providing full type support out of the box.
+- **Universal Compatibility**: Works in Node.js, Deno, and modern browsers via ESM, CommonJS, and UMD bundles.
+- **Built-in Lookup**: Includes simple utility functions to easily find the data you need.
 
-The data currently provided for each country is:
+-----
 
-* `name` The english name for the country
-* `alpha2` The [ISO 3166-1 alpha 2](http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) code
-* `alpha3` The [ISO 3166-1 alpha 3](http://en.wikipedia.org/wiki/ISO_3166-1_alpha-3) code
-* `status`: The ISO status of the entry - see below.
-* `currencies` An array of [ISO 4217 currency codes](http://en.wikipedia.org/wiki/ISO_4217) with the primary one first
-* `languages` An array of [ISO 639-2](http://en.wikipedia.org/wiki/ISO_639-2) codes for languages (may not be complete).
-* `countryCallingCodes` An array of the international call prefixes for this country.
-* `ioc` The [International Olympic Committee country code](http://en.wikipedia.org/wiki/List_of_IOC_country_codes)
-* `emoji` The emoji of country's flag.
-* `subunits` Geographically disjoint components like Alaska in the USA, administratively distinct regions such as the countries of Great Britain, or overseas islands for many European nations.
+## Installation
 
-### Status notes
+```bash
+# Using npm
+npm install geodex
 
-The `status` can be one of 'assigned', 'reserved', 'user assigned' or 'deleted'.
+# Using yarn
+yarn add geodex
 
-Assigned means that the code is properly in the ISO 3166 standard. Reserved means that the code is being prevented from being used. Deleted means that it has been deleted. User Assigned means that for some use cases it is required. Deleted means that it used to be in the standard but is now not.
+# Using pnpm
+pnpm add geodex
+```
 
-See <https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2> for full details, especially the "User-assigned code elements" and "Reserved code elements" sections.
+-----
 
-## Regions
+## Usage
 
-Countries are ofter grouped into regions. The list of regions is by no means exhaustive, pull requests very welcome for additions.
+### ES Modules (Recommended)
 
-* `countries` An array of `alpha2` codes for the countries in this region.
+This is the recommended approach for modern applications, as it allows for tree-shaking.
 
-## Currencies
+```javascript
+import { countries, currencies, lookup } from 'geodex';
 
-It is not that useful to just have the currency code(s) for a country, so included is currency data too:
+// Get a specific country by its alpha-2 code
+const usa = countries['US'];
+console.log(usa.name); // 'United States'
+console.log(usa.currencies); // ['USD']
 
-* `name` The english name for the currency
-* `code` The [ISO 4217](http://en.wikipedia.org/wiki/ISO_4217) code
-* `number` The [ISO 4217](http://en.wikipedia.org/wiki/ISO_4217) number
-* `decimals` The number of decimal digits conventionally shown
-* `symbol` The currency symbol for the currency (e.g. ¥, $ etc.). Some symbols are not available, in which case
-    `symbol` contains the ISO 4217 code.  Credit to [bengourley/currency-symbol-map](https://github.com/bengourley/currency-symbol-map)
-    for the symbol database.
+// Get currency details
+const euro = currencies['EUR'];
+console.log(euro.name); // 'Euro'
+console.log(euro.symbol); // '€'
 
-## Languages
+// Use the lookup function to find countries
+const eurozone = lookup.countries({ currency: 'EUR' });
+console.log(eurozone.length); // e.g., 25
+```
 
-A list of languages provided by [ISO 639-2](http://en.wikipedia.org/wiki/ISO_639-2);
+### Tree-Shaking for Smaller Bundles
 
-* `name` The english name for the language
-* `alpha2` The two letter [ISO 639-1](http://en.wikipedia.org/wiki/ISO_639-1) code for the language (may be blank).
-* `alpha3` The three letter terminological [ISO 639-2](http://en.wikipedia.org/wiki/ISO_639-2) code for the language (may be blank).
-* `bibliograpic` The three letter bibliographic [ISO 639-2](http://en.wikipedia.org/wiki/ISO_639-2) code for the language (may be blank).
+For maximum optimization, you can import data modules directly. This is ideal for frontend projects where bundle size is critical.
 
-## Lookup
+```javascript
+// Import only the countries data
+import { countries } from 'geodex/data/countries';
 
-To make finding easier there are utility methods that can search the countries and currencies. See examples below.
+// Import only the currencies data
+import { currencies } from 'geodex/data/currencies';
+```
 
-### In the browser
+### Browser Usage (via CDN)
 
-Include the dist via the script tag
+You can use `geodex` directly in the browser via a CDN. The library will be available on the `window.geodex` object.
 
 ```html
-<script src='dist/geodex.min.js' />
-<script>
-  window.CountryDataList.getSymbolFromCurrency('USD') //=> '$'
-</script>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Geodex Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/geodex/dist/geodex.min.js"></script>
+</head>
+<body>
+    <script>
+        const symbol = window.geodex.currencies['USD'].symbol;
+        console.log(symbol); // '$'
+
+        const canada = window.geodex.countries['CA'];
+        console.log(canada.name); // 'Canada'
+    </script>
+</body>
+</html>
 ```
 
-## Installing
+### CommonJS (Legacy Node.js)
 
-``` bash
-npm install geodex
+For older Node.js projects using `require`.
+
+```javascript
+const { countries, currencies } = require('geodex');
+
+console.log(countries['JP'].name); // 'Japan'
+console.log(currencies['JPY'].symbol); // '¥'
 ```
 
-## Example usage
+-----
 
-* es5
+## API Reference
 
-``` javascript
-var countries        = require('geodex').countries,
-    currencies       = require('geodex').currencies,
-    regions          = require('geodex').regions,
-    languages        = require('geodex').languages,
-    callingCountries = require('geodex').callingCountries;
+### `countries`
 
-// .all gives you an array of all entries
-console.log( countries.all );
-console.log( currencies.all );
+An object containing all countries, keyed by their `alpha2` and `alpha3` codes.
 
-// countries are found using alpha2 or alpha3 (both uppercase)
-console.log( countries.BE.name );        // 'Belgium'
-console.log( countries.FRA.currencies ); // ['EUR']
+- `name`: The English name for the country (e.g., `'Germany'`).
+- `alpha2`: The ISO 3166-1 alpha-2 code (e.g., `'DE'`).
+- `alpha3`: The ISO 3166-1 alpha-3 code (e.g., `'DEU'`).
+- `currencies`: An array of ISO 4217 currency codes (e.g., `['EUR']`).
+- `languages`: An array of ISO 639-2 language codes.
+- `countryCallingCodes`: An array of international call prefixes (e.g., `['+49']`).
+- `ioc`: The IOC country code (e.g., `'GER'`).
+- `emoji`: The country's flag emoji (e.g., '🇩🇪').
+- `status`: The ISO 3166-1 assignment status (`'assigned'`, `'reserved'`, etc.).
 
-// callingCountries is like countries but only has entries with dialing codes.
+### `currencies`
 
-// currencies are accessed by their code (uppercase)
-console.log( currencies.USD.name ); // 'United States dollar'
+An object containing all currencies, keyed by their ISO 4217 code.
 
-// regions are accessed using a camel case name
-console.log( regions.europe.countries )
+- `name`: The currency name (e.g., `'British Pound'`).
+- `code`: The ISO 4217 code (e.g., `'GBP'`).
+- `number`: The ISO 4217 number (e.g., `'826'`).
+- `decimals`: The number of decimal digits used.
+- `symbol`: The currency symbol (e.g., `'£'`).
+
+### `languages`
+
+An object containing all languages, keyed by their `alpha3` code.
+
+- `name`: The English name of the language.
+- `alpha2`: The ISO 639-1 code (2-letter).
+- `alpha3`: The ISO 639-2 code (3-letter).
+- `bibliographic`: The ISO 639-2 bibliographic code.
+
+### `lookup`
+
+A utility object with functions to find data.
+
+- `lookup.countries({ key: value })`: Returns an array of countries matching the query.
+- `lookup.currencies({ key: value })`: Returns an array of currencies matching the query.
+- `lookup.languages({ key: value })`: Returns an array of languages matching the query.
+
+<!-- end list -->
+
+```javascript
+import { lookup } from 'geodex';
+
+// Find all countries that use the US Dollar
+const usdCountries = lookup.countries({ currency: 'USD' });
 ```
 
-``` javascript
-var lookup = require('geodex').lookup;
+-----
 
-// Match a value (grab first from array) case insensitive
-var france = lookup.countries({name: 'France'})[0];
+## Contributing
 
-// Or match one of several possible values.
-var eurozone_countries = lookup.countries({currencies: 'EUR'});
-```
+Contributions are welcome\! Please follow these steps to contribute:
 
-* es6
+1. **Fork** the repository on GitHub.
+2. **Clone** your fork locally:
 
-```
-import {countries} from 'geodex';
+    ```bash
+    git clone https://github.com/YOUR_USERNAME/geodex.git
+    ```
 
-console.log(countries.all);
+3. **Install** dependencies:
 
-// You can also use
-import {lookup} from 'geodex';
+    ```bash
+    cd geodex
+    npm install
+    ```
 
-// Match a value (grab first from array) case insensitive
-const france = lookup.countries({name: 'France'})[0];
-```
+4. Create a new **branch** for your feature or fix.
+5. Make your changes in the **`src`** directory.
+6. **Test** your changes:
 
-It is very simple for now - feel free to contribute more helpful accessors.
+    ```bash
+    npm test
+    ```
 
-## Possible future additions
+7. **Commit** and **push** your changes to your fork.
+8. Open a **Pull Request** on the main `geodex` repository.
 
-More data for each country is most welcome. Obvious things that it might be nice
-to add are:
+-----
 
-### Countries
+## License
 
-* Wikipedia links
-* Coordinates (centroid, bounding box, etc)
-
-### Currencies
-
-# Added Currency Symbol Maps
-
-* removed External Dependency for currency-symbol-map. Now we have 4 methods
-* currencySymbolMap => returns list of currency with name, number, symbol
-* getSymbolFromCurrency,
-* getNameFromCurrency,
-* getSafeSymbolFromCurrency,
-* getSafeNameFromCurrency
-
-## Other similar bits of code
-
-* [libphonenumber](https://code.google.com/p/libphonenumber/) "Google's common Java, C++ and Javascript library for parsing, formatting, storing and validating international phone numbers."
-
-## How to contribute
-
-You can change on JSON.
-
-These are the steps required:
-
-``` bash
-# Clone the repo (or better your fork of it)
-git clone https://github.com/future-station/geodex.git
-cd geodex
-
-# install the dependencies
-npm install .
-
-# Edit the countries.js
-open data/countries.js
-
-
-# Run the tests
-mocha
-
-# If all is ok commit and push
-git add .
-git commit
-git push
-
-# Then send a pull request with your changes. Ideally use several small commits,
-# and reference a source that backs up the change.
-```
-
-## Sources
-
-The currency data was copied from the [Wikipedia ISO 4217](http://en.wikipedia.org/wiki/ISO_4217) page.
-
-The country calling codes came from the  [Wikipedia country calling codes](http://en.wikipedia.org/wiki/List_of_country_calling_codes) page.
-
-## Added typescript definations
+This project is licensed under the **MIT License**. See the [LICENSE](https://www.google.com/search?q=LICENSE) file for details.
