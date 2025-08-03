@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geodex Currency Lookup</title>
+    <script src='dist/geodex.min.js'></script>
+    <style>
+        /* General Styling & Font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+        :root {
+            --primary-color: #007BFF;
+            --primary-hover: #0056b3;
+            --background-color: #f4f7f9;
+            --card-background: #ffffff;
+            --text-color: #333;
+            --border-color: #dee2e6;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Card Layout */
+        .card {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            overflow: hidden;
+            margin: 1rem;
+        }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .card-header h1 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .card-header p {
+            margin: 0.25rem 0 0;
+            opacity: 0.9;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        /* Form Styling */
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-group {
+            display: flex;
+        }
+
+        #currency-code {
+            flex-grow: 1;
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px 0 0 6px;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        #currency-code:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        button[type="submit"] {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: white;
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 0 6px 6px 0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button[type="submit"]:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Result Styling */
+        .result-container {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 1.25rem;
+            min-height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .result-container.success {
+            background-color: #e9f5ec;
+            color: var(--success-color);
+            font-weight: 700;
+            font-size: 2.5rem;
+        }
+
+        .result-container.error {
+            background-color: #fbebec;
+            color: var(--error-color);
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <header class="card-header">
+            <h1>Geodex</h1>
+            <p>Currency Symbol Lookup</p>
+        </header>
+
+        <main class="card-body">
+            <form id="currency-form">
+                <label for="currency-code">Enter ISO Currency Code</label>
+                <div class="input-group">
+                    <input type="text" id="currency-code" placeholder="e.g., USD, EUR, JPY" required>
+                    <button type="submit">Find</button>
+                </div>
+            </form>
+
+            <div id="result" class="result-container" aria-live="polite">
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Wait for the DOM to be fully loaded before running the script
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get references to the HTML elements
+            const currencyForm = document.getElementById('currency-form');
+            const currencyInput = document.getElementById('currency-code');
+            const resultContainer = document.getElementById('result');
+
+            // Add a 'submit' event listener to the form
+            currencyForm.addEventListener('submit', (event) => {
+                // Prevent the default form submission which reloads the page
+                event.preventDefault();
+
+                // Get the currency code from the input, trim whitespace, and convert to uppercase
+                const currencyCode = currencyInput.value.trim().toUpperCase();
+
+                // Clear previous result classes
+                resultContainer.className = 'result-container';
+                resultContainer.textContent = '';
+
+                // Ensure input is not empty
+                if (!currencyCode) {
+                    displayResult('Please enter a code.', 'error');
+                    return;
+                }
+
+                // Use the Geodex library to find the symbol
+                const symbol = window.geodex.getSymbolFromCurrency(currencyCode);
+
+                // Display the result
+                if (symbol) {
+                    displayResult(symbol, 'success');
+                } else {
+                    displayResult(`Symbol not found for "${currencyCode}".`, 'error');
+                }
+            });
+
+            /**
+             * Helper function to display the result in the UI
+             * @param {string} message - The message or symbol to display
+             * @param {'success'|'error'} type - The type of result for styling
+             */
+            function displayResult (message, type) {
+                // Use a slight delay to make the style change more noticeable
+                setTimeout(() => {
+                    resultContainer.textContent = message;
+                    resultContainer.classList.add(type);
+                }, 100);
+            }
+        });
+    </script>
+</body>
+
+</html>

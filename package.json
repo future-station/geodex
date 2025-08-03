@@ -1,0 +1,87 @@
+{
+    "name": "geodex",
+    "version": "1.0.0",
+    "description": "A modern, zero-dependency, and tree-shakeable JavaScript library for comprehensive country, currency, and language data. Includes full TypeScript support and lookup functions.",
+    "author": {
+        "name": "Future Station",
+        "url": "https://github.com/future-station"
+    },
+    "homepage": "https://github.com/future-station/geodex",
+    "bugs": {
+        "url": "https://github.com/future-station/geodex/issues"
+    },
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:future-station/geodex.git"
+    },
+    "funding": {
+        "type": "github",
+        "url": "https://github.com/sponsors/future-station"
+    },
+    "main": "dist/index.js",
+    "lint-staged": {
+        "*.js": [
+            "eslint --fix",
+            "prettier --config .prettierrc --write"
+        ]
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "scripts": {
+        "build": "rm -r dist/* && npx tsc && babel src -d dist",
+        "pack": "npx webpack --mode production",
+        "test": "mocha",
+        "lint": "eslint src",
+        "prepare": "npm run lint --fix && npm run test && npm run build",
+        "prettify": "prettier --config .prettierrc --write '*/**/*.js'"
+    },
+    "keywords": [
+        "country",
+        "countries",
+        "currency",
+        "currencies",
+        "data",
+        "esm",
+        "geo",
+        "geography",
+        "i18n",
+        "internationalization",
+        "iso",
+        "iso-3166",
+        "iso-4217",
+        "language",
+        "languages",
+        "locale",
+        "lookup",
+        "tree-shaking",
+        "typescript",
+        "world",
+        "zero-dependency"
+    ],
+    "devDependencies": {
+        "@babel/cli": "^7.24.8",
+        "@babel/core": "^7.25.2",
+        "@babel/preset-env": "^7.25.3",
+        "@babel/register": "^7.24.6",
+        "babel-eslint": "^10.1.0",
+        "babel-loader": "^9.2.1",
+        "chai": "4.3.7",
+        "eslint": "^9.18.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-prettier": "^5.2.1",
+        "husky": "^9.1.4",
+        "lint-staged": "^15.2.9",
+        "lodash": ">=4.17.21",
+        "mixin-deep": ">=2.0.1",
+        "mocha": "^10.2.0",
+        "prettier": "^3.4.2",
+        "set-value": ">=4.1.0",
+        "typescript": "^5.5.4",
+        "webpack": "^5.97.1",
+        "webpack-cli": "^6.0.1"
+    }
+}
