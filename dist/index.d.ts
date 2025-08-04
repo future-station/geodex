@@ -9,6 +9,13 @@ export namespace currencies {
 export namespace languages {
     export { languagesAll as all };
 }
+export namespace timezones {
+    export { allTimezones as all };
+    export { timezonesAll as byCountry };
+    export function getTimezonesByCountry(countryCode: any): any;
+    export function getCountriesForTimezone(timezone: any): string[];
+    export function getUtcOffset(timezone: any): string;
+}
 export const lookup: {
     countries: any;
     currencies: any;
@@ -28,6 +35,8 @@ import { getSafeNameFromCurrency } from './data/currency-symbol';
 import countriesAll from './data/countries';
 import currenciesAll from './data/currencies';
 import languagesAll from './data/languages';
+declare const allTimezones: string[];
+import timezonesAll from './data/timezones';
 declare const callingCodesAll: any[];
 export { continents, regions, currencySymbolMap, getSymbolFromCurrency, getNameFromCurrency, getSafeSymbolFromCurrency, getSafeNameFromCurrency };
 //# sourceMappingURL=index.d.ts.map

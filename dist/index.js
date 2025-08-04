@@ -42,7 +42,7 @@ Object.defineProperty(exports, "getSymbolFromCurrency", {
     return _currencySymbol.getSymbolFromCurrency;
   }
 });
-exports.regions = exports.lookup = exports.languages = void 0;
+exports.timezones = exports.regions = exports.lookup = exports.languages = void 0;
 var _currencySymbol = require("./data/currency-symbol");
 var _continents = _interopRequireDefault(require("./data/continents"));
 var regions = _interopRequireWildcard(require("./data/regions"));
@@ -50,6 +50,7 @@ exports.regions = regions;
 var _countries = _interopRequireDefault(require("./data/countries"));
 var _currencies = _interopRequireDefault(require("./data/currencies"));
 var _languages = _interopRequireDefault(require("./data/languages"));
+var _timezones = _interopRequireDefault(require("./data/timezones"));
 var _lookup = _interopRequireDefault(require("./lookup"));
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function _interopRequireWildcard(e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, "default": e }; if (null === e || "object" != _typeof(e) && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (var _t in e) "default" !== _t && {}.hasOwnProperty.call(e, _t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, _t)) && (i.get || i.set) ? o(f, _t, i) : f[_t] = e[_t]); return f; })(e, t); }
 function _interopRequireDefault(e) { return e && e.__esModule ? e : { "default": e }; }
@@ -96,10 +97,56 @@ _languages["default"].forEach(function (language) {
   languages[language.bibliographic] = language;
   languages[language.alpha3] = language;
 });
+
+// Create a flat array of all unique timezones
+var allTimezones = Array.from(new Set(Object.values(_timezones["default"]).flat())).sort();
+var timezones = exports.timezones = {
+  all: allTimezones,
+  byCountry: _timezones["default"],
+  getTimezonesByCountry: function getTimezonesByCountry(countryCode) {
+    // Handle both uppercase and lowercase country codes
+    var normalizedCode = countryCode ? countryCode.toUpperCase() : '';
+    return _timezones["default"][normalizedCode] || null;
+  },
+  getCountriesForTimezone: function getCountriesForTimezone(timezone) {
+    return Object.keys(_timezones["default"]).filter(function (countryCode) {
+      return _timezones["default"][countryCode].includes(timezone);
+    });
+  },
+  getUtcOffset: function getUtcOffset(timezone) {
+    if (!timezone || typeof timezone !== 'string') {
+      return null;
+    }
+    try {
+      // Use Intl API to get the UTC offset for the timezone
+      var now = new Date();
+      var utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
+      var targetTime = new Date(utc.toLocaleString('en-US', {
+        timeZone: timezone
+      }));
+      var offsetMs = targetTime.getTime() - utc.getTime();
+      var offsetHours = Math.floor(offsetMs / (1000 * 60 * 60));
+      var offsetMinutes = Math.floor(Math.abs(offsetMs) % (1000 * 60 * 60) / (1000 * 60));
+      var sign = offsetMs >= 0 ? '+' : '-';
+      var hours = Math.abs(offsetHours).toString().padStart(2, '0');
+      var minutes = offsetMinutes.toString().padStart(2, '0');
+      return minutes === '00' ? "".concat(sign).concat(hours) : "".concat(sign).concat(hours, ":").concat(minutes);
+    } catch (_unused) {
+      // Invalid timezone
+      return null;
+    }
+  }
+};
+
+// Add country code mappings for backward compatibility
+Object.keys(_timezones["default"]).forEach(function (countryCode) {
+  timezones[countryCode] = _timezones["default"][countryCode];
+});
 var lookup = exports.lookup = (0, _lookup["default"])({
   countries: _countries["default"],
   currencies: _currencies["default"],
-  languages: _languages["default"]
+  languages: _languages["default"],
+  timezones: _timezones["default"]
 });
 var callingCountries = exports.callingCountries = {
   all: []

@@ -11,6 +11,7 @@ import * as regions from './data/regions';
 import countriesAll from './data/countries';
 import currenciesAll from './data/currencies';
 import languagesAll from './data/languages';
+import timezonesAll from './data/timezones';
 import lookupFn from './lookup';
 
 const countries = {
@@ -59,10 +60,69 @@ languagesAll.forEach((language) => {
   languages[language.alpha3] = language;
 });
 
+// Create a flat array of all unique timezones
+const allTimezones = Array.from(
+  new Set(Object.values(timezonesAll).flat())
+).sort();
+
+const timezones = {
+  all: allTimezones,
+  byCountry: timezonesAll,
+
+  getTimezonesByCountry: (countryCode) => {
+    // Handle both uppercase and lowercase country codes
+    const normalizedCode = countryCode ? countryCode.toUpperCase() : '';
+    return timezonesAll[normalizedCode] || null;
+  },
+
+  getCountriesForTimezone: (timezone) => {
+    return Object.keys(timezonesAll).filter((countryCode) =>
+      timezonesAll[countryCode].includes(timezone)
+    );
+  },
+
+  getUtcOffset: (timezone) => {
+    if (!timezone || typeof timezone !== 'string') {
+      return null;
+    }
+
+    try {
+      // Use Intl API to get the UTC offset for the timezone
+      const now = new Date();
+      const utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
+      const targetTime = new Date(
+        utc.toLocaleString('en-US', { timeZone: timezone })
+      );
+      const offsetMs = targetTime.getTime() - utc.getTime();
+      const offsetHours = Math.floor(offsetMs / (1000 * 60 * 60));
+      const offsetMinutes = Math.floor(
+        (Math.abs(offsetMs) % (1000 * 60 * 60)) / (1000 * 60)
+      );
+
+      const sign = offsetMs >= 0 ? '+' : '-';
+      const hours = Math.abs(offsetHours).toString().padStart(2, '0');
+      const minutes = offsetMinutes.toString().padStart(2, '0');
+
+      return minutes === '00'
+        ? `${sign}${hours}`
+        : `${sign}${hours}:${minutes}`;
+    } catch {
+      // Invalid timezone
+      return null;
+    }
+  },
+};
+
+// Add country code mappings for backward compatibility
+Object.keys(timezonesAll).forEach((countryCode) => {
+  timezones[countryCode] = timezonesAll[countryCode];
+});
+
 const lookup = lookupFn({
   countries: countriesAll,
   currencies: currenciesAll,
   languages: languagesAll,
+  timezones: timezonesAll,
 });
 
 const callingCountries = { all: [] };
@@ -123,6 +183,7 @@ export {
   countries,
   currencies,
   languages,
+  timezones,
   lookup,
   callingCountries,
   callingCodes,
